@@ -1,1 +1,1 @@
-# fsd
+pnpm dev to start the app.
