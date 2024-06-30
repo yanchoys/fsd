@@ -1,10 +1,3 @@
-/**
- * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
- * for Docker builds.
- */
-await import("./src/env.js");
-
-/** @type {import("next").NextConfig} */
 const config = {
   images: {
     dangerouslyAllowSVG: true,
@@ -21,6 +14,31 @@ const config = {
         port: "",
         pathname: "/api/categories/**",
       },
+      {
+        protocol: "http",
+        hostname: "backendy.eastus.cloudapp.azure.com",
+        port: "",
+        pathname: "/api/categories/**",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "image-cdn.timesharesoft.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "pictures.lodgix.com",
+        port: "",
+        pathname: "/**",
+      },
+      
     ],
   },
 };
