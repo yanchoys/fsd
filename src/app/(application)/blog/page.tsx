@@ -3,7 +3,7 @@ import Image from "next/image";
 
 import CustomButton from "../../ui/components/common/CustomButton";
 import CustomChip from "../../ui/components/common/CustomChip";
-import { MainCard } from "../../ui/components/common/Cards/Cards";
+// import { MainCard } from "~/app/ui/components/common";
 
 function page() {
   return (
@@ -39,7 +39,7 @@ function page() {
         </div>
       </div>
       <div className="mt-10 grid grid-cols-4 gap-8 py-10">
-        {Array.from({ length: 8 }, (_, i) => i + 1).map((card) => {
+        {/* {Array.from({ length: 8 }, (_, i) => i + 1).map((card) => {
           return (
             <MainCard
               imageUrl="/blog_photo.jpeg"
@@ -49,7 +49,7 @@ function page() {
               isBlogCard
             />
           );
-        })}
+        })} */}
       </div>
     </div>
   );

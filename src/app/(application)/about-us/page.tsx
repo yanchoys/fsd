@@ -4,8 +4,8 @@ import CustomChip from "../../ui/components/common/CustomChip";
 import Link from "next/link";
 import CustomIconBackground from "../../ui/components/common/CustomIconBackground";
 import NumbersCard from "./NumbersCard";
-import IconGenerator from "../../ui/components/common/IconGenerator";
 import Newsletter from "../../ui/components/common/Newsletter/Newsletter";
+import { IconGenerator } from "~/app/ui/components/common";
 
 export default function Component() {
   return (

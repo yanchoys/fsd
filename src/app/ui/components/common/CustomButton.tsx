@@ -1,5 +1,3 @@
-import React from "react";
-
 function CustomButton({ label, width }: { label: string; width: number }) {
   return (
     <button

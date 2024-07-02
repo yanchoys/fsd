@@ -1,35 +1,41 @@
 import { Suspense } from "react";
 import Image from "next/image";
 
-import AllistingsSection from "../ui/components/home/AllistingsSection";
-import BlogSection from "../ui/components/home/BlogSection";
-import DiscoverSection from "../ui/components/home/DiscoverSection";
-import FeaturedListingsSection from "../ui/components/home/FeaturedListingsSection";
-import HeroSection from "../ui/components/home/HeroSection";
-import PopularCategories from "../ui/components/home/PopularCategories";
 import {
   AllListingsSkeleton,
   FeaturedListingsSkeleton,
   PopularCategoriesSkeleton,
 } from "../ui/components/common/Skeletons/Skeletons";
+import {
+  BlogSection,
+  AllistingsSection,
+  HeroSection,
+  PopularCategories,
+  FeaturedListingsSection,
+  DiscoverSection,
+} from "../ui/components/home/index";
 
 export default async function HomePage() {
   return (
     <main className="flex flex-col">
-      <div className="relative flex h-[714px] w-full">
-        <Image
-          alt="Coolvacay background image"
-          src="/landing_background.png"
-          quality={100}
-          fill
-          priority={true}
-          sizes="100vw"
-          style={{
-            objectFit: "cover",
-            filter: "brightness(60%)",
-            zIndex: -1,
-          }}
-        />
+      <div className="relative flex h-[614px]">
+        <div className="absolute flex h-[714px] w-full">
+          <Image
+            alt="Coolvacay background image"
+            src="/landing_background.png"
+            quality={100}
+            fill
+            priority={true}
+            sizes="100vw"
+            style={{
+              position: "absolute",
+              top: -100,
+              objectFit: "cover",
+              filter: "brightness(60%)",
+              zIndex: -1,
+            }}
+          />
+        </div>
       </div>
       <div className="flex justify-center">
         <div className="flex max-w-[1220px] flex-col items-center justify-center">

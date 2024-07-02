@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import React, { useState } from "react";
-import PasswordInput from "../../ui/components/PasswordInput/PasswordInput";
 import { Formik, Form, type FormikHelpers } from "formik";
 import Loader from "../../ui/components/common/Loader/loader";
 import * as Yup from "yup";
 import { Button } from "@mui/base";
+// import { FormikTextField } from "~/app/ui/components/common";
 
 export type LoginValue = {
   confirmPassword: string;
@@ -28,7 +28,7 @@ const validationSchema = Yup.object().shape({
 
 function SetNewPassword() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  // const [error, setError] = useState("");
 
   const handleSubmit = async (
     values: LoginValue,
@@ -85,11 +85,11 @@ function SetNewPassword() {
             onSubmit={handleSubmit}
           >
             {({
-              errors,
-              touched,
-              values,
-              handleChange,
-              handleBlur,
+              // errors,
+              // touched,
+              // values,
+              // handleChange,
+              // handleBlur,
               isValid,
               isSubmitting,
             }) => {
@@ -102,17 +102,18 @@ function SetNewPassword() {
                     >
                       New Password
                     </label>
-                    <PasswordInput
+                    {/* TODO: refactor here */}
+                    {/* <FormikTextField
                       placeholder="Password"
                       name="password"
                       error={!!touched.password && !!errors.password}
-                      value={values.password}
+                      // value={values.password}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         handleChange(e);
                         setError("");
                       }}
                       onBlur={handleBlur}
-                    />
+                    /> */}
                   </div>
                   <div>
                     <label
@@ -121,7 +122,7 @@ function SetNewPassword() {
                     >
                       Confirm Password
                     </label>
-                    <PasswordInput
+                    {/* <PasswordInput
                       placeholder="Confirm Password"
                       name="confirmPassword"
                       error={
@@ -133,7 +134,7 @@ function SetNewPassword() {
                         setError("");
                       }}
                       onBlur={handleBlur}
-                    />
+                    /> */}
                   </div>
                   <Button
                     className={`h-15 flex w-full items-center justify-center rounded-[100px] bg-primary p-4 text-white disabled:opacity-50`}

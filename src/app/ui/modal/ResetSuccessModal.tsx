@@ -1,4 +1,4 @@
-import Modal, { ModalProps } from "../components/Modal/modal";
+import Modal, { type ModalProps } from "../components/Modal/modal";
 import React from "react";
 
 type Props = ModalProps;

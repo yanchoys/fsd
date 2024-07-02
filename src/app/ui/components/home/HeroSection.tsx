@@ -1,6 +1,6 @@
-import SearchCard from "./SearchCard";
+import { SearchCard } from "./SearchCard";
 
-export default async function HeroSection() {
+export async function HeroSection() {
   return (
     <main className="absolute top-0 items-center text-white">
       <div className="flex max-w-[1220px] justify-between py-44">

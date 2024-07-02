@@ -17,17 +17,26 @@ export interface ListingData {
   imageUrl: string;
   latitude: number;
   longitude: number;
+  images: {
+    url: string;
+    name: string;
+  }[];
+  amenities: string[];
+  numberOfGuests: number;
 }
 
 export type ListingCardProps = Pick<
   ListingData,
-  "name" | "imageUrl" | "price"
+  "name" | "imageUrl" | "price" | "id" | "source"
 > & { subtitle: string };
 
 export type MainCardProps = Pick<
   ListingData,
-  "name" | "imageUrl" | "propertyType" | "squareFeets"
+  "name" | "imageUrl" | "propertyType" | "squareFeets" | "id" | "source"
 > & { isBlogCard?: boolean; subtitle: string };
+
+export type SimilarCardProps = MainCardProps &
+  Pick<ListingData, "bedrooms" | "bathrooms" | "numberOfGuests" | "price">;
 
 export interface PopularCategoriesData {
   id: number;
@@ -43,3 +52,18 @@ export type MapboxMarkerData = Pick<
   ListingData,
   "id" | "name" | "city" | "state" | "price" | "latitude" | "longitude"
 >;
+
+export type UserData = {
+  accessToken: string;
+  accessTokenExpiresAt: string;
+  profile: {
+    id: number | string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    nationality: string;
+    dateOfBirth: string;
+    gender: string;
+  };
+};

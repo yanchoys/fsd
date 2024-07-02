@@ -1,7 +1,7 @@
 import "~/styles/globals.css";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
 import { Inter } from "next/font/google";
-import NavBar from "../ui/components/NavBar";
+import NavBarWrapper from "../ui/components/common/Navbar/NavBar.server";
 import FooterSection from "../ui/components/FooterSection";
 import MuiXLicense from "../MuiXLicense";
 import theme from "../../theme";
@@ -25,7 +25,7 @@ export default function RootLayout({
       <body className={`${inter.className} flex flex-col`}>
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>
-            <NavBar />
+            <NavBarWrapper />
             {children}
             <FooterSection />
             <MuiXLicense />

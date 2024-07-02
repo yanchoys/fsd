@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-const Newsletter = () => {
+export default function Newsletter() {
   return (
     <form>
       <div className="relative flex w-full shrink-0 rounded-xl">
@@ -35,6 +35,4 @@ const Newsletter = () => {
       </div>
     </form>
   );
-};
-
-export default Newsletter;
+}

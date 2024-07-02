@@ -58,7 +58,6 @@ export function AllListingsSkeleton() {
 }
 
 export function FilteredListingsSkeleton() {
-  console.log("runsssss");
   return (
     <div className="grid grid-cols-1 gap-5 desktop:grid-cols-2">
       {Array.from({ length: 10 }, (_, i) => i + 1).map((skeleton) => {

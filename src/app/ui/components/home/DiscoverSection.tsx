@@ -1,18 +1,21 @@
 import React from "react";
 import Image from "next/image";
 
-function DiscoverSection() {
+export function DiscoverSection() {
   return (
     <section className="flex max-h-[680px] shrink-0 grow-0 gap-12 py-14">
-      <Image
-        src="/discover_photo.png"
-        alt="Discover more destinations"
-        width={492}
-        height={480}
-        quality={90}
-        style={{ height: "460px" }}
-        className="rounded-[30px]"
-      />
+      <div className="flex h-[460px] w-[492px] shrink-0">
+        <Image
+          src="/discover_photo.png"
+          alt="Discover more destinations"
+          width={0}
+          height={0}
+          sizes="100vw"
+          quality={90}
+          style={{ height: "460px", width: "auto" }}
+          className="rounded-[30px]"
+        />
+      </div>
       <div className="flex grow-0 flex-col justify-center gap-3">
         <div className="flex h-[44px] w-[90px] shrink-0 justify-center rounded-[64px] bg-[#29ABE2]/[.10] p-3 text-sm text-primary">
           Discover
@@ -41,5 +44,3 @@ function DiscoverSection() {
     </section>
   );
 }
-
-export default DiscoverSection;

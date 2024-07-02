@@ -1,4 +1,4 @@
-import { ListingCard } from "../common/Cards/Cards";
+import { ListingCard } from "../common";
 import type { ListingData } from "~/app/(application)/definitions";
 
 export async function ListingSection({
@@ -11,6 +11,8 @@ export async function ListingSection({
       {listings.map((listing) => {
         return (
           <ListingCard
+            id={listing.id}
+            source={listing.source}
             key={listing.id}
             name={listing.name}
             subtitle={`${listing.city}, ${listing.state}`}

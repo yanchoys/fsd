@@ -29,6 +29,7 @@
       "~/*": ["./src/*"]
     }
   },
+  "typeRoots": ["./node_modules/@types", "./src/types"],
   "include": [
     ".eslintrc.cjs",
     "next-env.d.ts",
