@@ -9,15 +9,72 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '20.12.2'
-  displayName: 'Install Node.js'
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '20.12.2'
+    displayName: 'Install Node.js'
 
-- script: |
-    npm install -g pnpm@9.1.2
-    pnpm 
-    pnpm install
-    pnpm run build
-  displayName: 'pnpm install and build'
+  - script: |
+      pwd
+      ls -la
+      cat package.json
+    displayName: 'List directory structure'
+
+
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/frontend.zip'
+      replaceExistingArchive: true
+    displayName: 'Archive built frontend files'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)/frontend.zip'
+      ArtifactName: 'frontend-drop'
+      publishLocation: 'container'
+    displayName: 'Publish Artifact'
+
+  - task: SSH@0
+    inputs:
+      sshEndpoint: '$(sshServiceConnection)'
+      runOptions: 'inline'
+      inline: |
+        sudo systemctl stop nextjs
+        sudo chown -R azureuser:azureuser /home/azureuser/deployments
+        sudo rm -rf /home/azureuser/deployments/*
+        sudo chown -R azureuser:azureuser /home/azureuser/deployments
+    displayName: 'Clean deployment folder with elevated permissions'
+
+  - task: CopyFilesOverSSH@0
+    inputs:
+      sshEndpoint: '$(sshServiceConnection)'
+      sourceFolder: '$(Build.ArtifactStagingDirectory)'
+      contents: '**/*'
+      targetFolder: '/home/azureuser/deployments'
+      cleanTargetFolder: false
+    displayName: 'Copy files to Azure VM'
+
+  - task: SSH@0
+    inputs:
+      sshEndpoint: '$(sshServiceConnection)'
+      runOptions: 'inline'
+      inline: |
+        cd /home/azureuser/deployments
+        sudo unzip -o frontend.zip
+        sudo chown -R azureuser:azureuser /home/azureuser/deployments
+        sudo npm install -g pnpm@9.1.2
+        sudo pnpm install
+        sudo pnpm build
+        echo "AUTH_GOOGLE_ID=$(AUTH_GOOGLE_ID)" >> .env
+        echo "AUTH_GOOGLE_SECRET=$(AUTH_GOOGLE_SECRET)" >> .env
+        echo "AUTH_SECRET=$(AUTH_SECRET)" >> .env
+        echo "NEXT_PUBLIC_API_URL=$(NEXT_PUBLIC_API_URL)" >> .env
+        echo "NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=$(NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN)" >> .env
+        sudo systemctl daemon-reload
+        sudo systemctl restart nextjs
+        sudo systemctl start nextjs
+        sudo systemctl enable nextjs.service
+    displayName: 'Install dependencies and start Next.js application'

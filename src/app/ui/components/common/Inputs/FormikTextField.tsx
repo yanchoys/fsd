@@ -17,6 +17,7 @@ interface FormikTextFieldProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error: boolean | undefined;
   helperText: React.ReactNode;
+  type?: string;
 }
 export default function FormikTextField({
   name,
@@ -25,6 +26,7 @@ export default function FormikTextField({
   onChange,
   error,
   helperText,
+  type = "text",
 }: FormikTextFieldProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -45,14 +47,14 @@ export default function FormikTextField({
       onBlur={onBlur}
       onChange={onChange}
       error={error}
-      type={name === "password" ? (showPassword ? "text" : "password") : "text"}
+      type={type === "password" ? (showPassword ? "text" : "password") : "text"}
       sx={{ borderRadius: "50px" }}
       InputProps={{
         style: {
           borderRadius: "50px",
         },
         endAdornment:
-          name === "password" ? (
+          type === "password" ? (
             <InputAdornment position="end">
               <IconButton
                 aria-label="toggle password visibility"

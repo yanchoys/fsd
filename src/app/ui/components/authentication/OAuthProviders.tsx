@@ -11,13 +11,13 @@ export default function OAuthProviders({
       <div className="flex flex-col gap-8">
         <div className="grid grid-cols-3 items-center justify-center gap-5">
           <div className="h-[1px] w-full bg-[#EAEAEF]" />
-          <h1 className="size-md text-center text-[#9FA4AA]">
+          <h1 className="text-center text-sm text-[#9FA4AA] sm:text-base">
             Or connect with
           </h1>
           <div className="h-[1px] w-full bg-[#EAEAEF]" />
         </div>
       </div>
-      <div className="flex w-full justify-between gap-5">
+      <div className="flex w-full justify-between  gap-1 sm:gap-5">
         {Object.values(providerMap).map((provider) => {
           if (provider.id !== "credentials")
             return (
@@ -31,13 +31,13 @@ export default function OAuthProviders({
               >
                 <button
                   type="submit"
-                  className="flex w-full items-center justify-center rounded-[100px] border border-[#ADB5BD] px-5 py-4 text-[15px]"
+                  className="flex w-full items-center justify-center rounded-[100px] border border-[#ADB5BD] px-2 py-3 text-xs sm:px-5 sm:py-4 sm:text-[15px]"
                 >
-                  <span className="mr-2">
+                  <span className="mr-1 sm:mr-2">
                     <IconGenerator
                       alt={`${provider.id} icon`}
                       src={`/logo_${provider.id}.svg`}
-                      width="32px"
+                      className="w-4 sm:w-8"
                     />
                   </span>
                   {` Sign ${page === "signin" ? "in" : "up"} with ${provider.name}`}{" "}

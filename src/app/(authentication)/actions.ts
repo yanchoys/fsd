@@ -6,6 +6,7 @@ import { signIn, signOut } from "~/auth";
 import { capitalize } from "../utils/helpers";
 import { redirect } from "next/navigation";
 import { FetchError } from "../utils/definitions";
+import type { TUserData } from "../(application)/definitions";
 
 export async function authenticateCR(
   prevState: string | undefined,
@@ -35,10 +36,14 @@ export async function authenticateGO(
 ) {
   try {
     if (idToken && accessToken) {
-      await postFetch("/Auth/google-login", {
+      const res = await postFetch<TUserData>("/Auth/google-login", {
         idToken: idToken,
         accessToken: accessToken,
       });
+      if (res instanceof FetchError) {
+        throw res;
+      }
+      return res;
     } else {
       return "User not found";
     }
@@ -50,14 +55,17 @@ export async function authenticateGO(
 
 export async function authenticateFB(accessToken: string | undefined) {
   try {
-    await postFetch("/Auth/facebook-login", {
+    const res = await postFetch<TUserData>("/Auth/facebook-login", {
       accessToken: accessToken,
     });
+    if (res instanceof FetchError) {
+      throw res;
+    }
+    return res;
   } catch (error) {
     console.error("Failed to login user via Facebook:", error);
     return "Failed to login user via Facebook, please try another method.";
   }
-  redirect("/account-verification");
 }
 
 export async function register(
@@ -87,7 +95,7 @@ export async function register(
 
 export async function verifyAccount(
   prevState: string | undefined,
-  code: string,
+  { code }: { code: string },
 ) {
   try {
     const res = await postFetch("/Users/activate", { code: code });
@@ -99,6 +107,74 @@ export async function verifyAccount(
       return `${error.message}`;
     } else {
       return "Failed to activate user";
+    }
+  }
+  redirect("/signin");
+}
+
+export async function resetPassOTP(
+  prevState: string | undefined,
+  { code, email }: { code: string; email: string },
+) {
+  try {
+    const res = await postFetch("/Users/verify-reset-password", {
+      resetCode: code,
+      email: email,
+    });
+    if (res instanceof FetchError) {
+      throw res;
+    }
+  } catch (error) {
+    if (error instanceof FetchError) {
+      return `${error.message}`;
+    } else {
+      return "Failed to validate OTP";
+    }
+  }
+  redirect("/set-new-password");
+}
+
+export async function resetPassViaEmail(
+  prevState: string | undefined,
+  { email }: { email: string },
+) {
+  try {
+    const res = await postFetch("/Users/forgot-password", { email: email });
+    if (res instanceof FetchError) {
+      throw res;
+    }
+  } catch (error) {
+    if (error instanceof FetchError) {
+      return `${error.message}`;
+    } else {
+      return "Failed to find user";
+    }
+  }
+  redirect("/password-reset");
+}
+
+export async function setNewPassword(
+  prevState: string | undefined,
+  {
+    email,
+    resetCode,
+    newPassword,
+  }: { email: string; resetCode: string; newPassword: string },
+) {
+  try {
+    const res = await postFetch("/Users/reset-password", {
+      email,
+      resetCode,
+      newPassword,
+    });
+    if (res instanceof FetchError) {
+      throw res;
+    }
+  } catch (error) {
+    if (error instanceof FetchError) {
+      return `${error.message}`;
+    } else {
+      return "Failed to find user";
     }
   }
   redirect("/signin");

@@ -11,25 +11,26 @@ export default async function SignIn() {
   if (session) redirect("/");
 
   return (
-    <div className="flex w-full flex-col gap-20">
+    <div className="flex w-full flex-col gap-4 sm:gap-20">
       <div className="w-full">
         <Link href="/" className="text-left">
           <Image
             src="/cool_vacay_logo_blue.svg"
             alt="CoolVacay Logo"
-            width={200}
-            height={22}
+            className="w-[140px] sm:w-[200px]"
+            width={0}
+            height={0}
           />
         </Link>
       </div>
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-4 sm:gap-8">
         <div>
-          <h1 className="mb-4 text-3xl">Sign in</h1>
+          <h1 className="mb-4 text-[28px] sm:text-3xl">Sign in</h1>
           <p className="text-[#9FA4AA]">
             Be ready to unlock exclusive features only with Coolvacay
           </p>
         </div>
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6 sm:gap-8">
           <SignInForm />
           <OAuthProviders page="signin" />
         </div>

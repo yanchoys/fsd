@@ -1,139 +1,165 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useDebouncedCallback } from "use-debounce";
-import dayjs, { type Dayjs } from "dayjs";
-
+import { useState } from "react";
+import dayjs from "dayjs";
 import type { SelectChangeEvent } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
-
-import { capitalize } from "~/app/utils/helpers";
-import { IconGenerator, SimpleInput, SimpleSelectInput } from "../common";
+import { MenuItem, IconButton, InputAdornment } from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
+import { useAppSearchParams } from "~/context/SearchParamsContext";
+import {
+  CitiesAutocomplete,
+  IconGenerator,
+  SimpleSelectInput,
+  StyledDatePicker,
+} from "../common";
 import type { DateRangeType } from "../home/SearchCard";
+import GridMapToggle from "./GridMapToggle";
+import type {
+  ILocationsList,
+  IPopularCategoriesData,
+} from "~/app/(application)/definitions";
+import CategoriesAutocomplete from "../common/Inputs/CategoriesAutocomplete";
 
-export default function Filters() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+const guests = Array.from({ length: 8 }, (v, i) => i + 1)
+  .map((item) => item.toString())
+  .map((guest) => (
+    <MenuItem key={guest} value={guest} dense>
+      {`${guest} ${guest === "1" ? "guest" : "guests"}`}
+    </MenuItem>
+  ));
 
-  const params = useMemo(() => {
-    const newParams = new URLSearchParams(searchParams);
-    return newParams;
-  }, [searchParams]);
-  const pathname = usePathname();
+export default function Filters({
+  locationsList,
+  categories,
+}: {
+  locationsList: ILocationsList[];
+  categories: IPopularCategoriesData[];
+}) {
+  const { searchParams, searchParamsValues, updateSearchParams } =
+    useAppSearchParams();
 
-  const endDate =
-    params.get("ToDate") !== null
-      ? dayjs(params.get("ToDate"))
-      : dayjs().add(6, "day");
-  const [dates, setDates] = useState<DateRangeType>([
-    dayjs(params.get("FromDate") ?? undefined),
-    endDate,
-  ]);
-  const [numberOfGuests, setNumberOfGuests] = useState(
-    params.get("NumberOfGuests") ?? "1",
+  const dates = [
+    searchParamsValues.fromDate,
+    searchParamsValues.toDate,
+  ] as DateRangeType;
+
+  const [showClearButton, setShowClearButton] = useState(false);
+  const [isMapMode, setIsMapMode] = useState(
+    searchParamsValues.isMapMode === "true",
   );
 
-  const title =
-    params.get("category") ??
-    (params?.get("Match") && capitalize(params.get("Match")!));
-  const [location, setLocation] = useState(title);
+  const selectedCategory =
+    categories.find((item) => item.name === searchParams?.get("category")) ??
+    null;
 
-  const handleSearch = useDebouncedCallback((term: string) => {
-    if (term) {
-      params.set("Match", term);
-    } else {
-      params.delete("Match");
-      params.delete("category");
-    }
-    router.replace(`/listings?${params.toString()}`);
-  }, 300);
-
-  const updateSearchParams = useCallback(
-    (param: string, value: string) => {
-      params.delete(param);
-      if (value) {
-        params.append(param, value);
-        router.replace(`${pathname}?${params.toString()}`, {
-          scroll: false,
-        });
-      }
-    },
-    [pathname, router, params],
+  const [category, setCategory] = useState<string>(
+    searchParamsValues.category ?? "",
   );
-  const [fromDate, toDate] = dates;
 
-  useEffect(() => {
-    fromDate && updateSearchParams("FromDate", fromDate.format("YYYY-MM-DD"));
-  }, [updateSearchParams, fromDate]);
-  useEffect(() => {
-    toDate && updateSearchParams("ToDate", toDate.format("YYYY-MM-DD"));
-  }, [updateSearchParams, toDate]);
+  const selectedLocation =
+    locationsList.find((item) => item.match === searchParams?.get("match")) ??
+    null;
 
-  useEffect(() => {
-    updateSearchParams("NumberOfGuests", numberOfGuests);
-  }, [updateSearchParams, numberOfGuests]);
+  const [location, setLocation] = useState<string>(
+    selectedLocation?.displayName ?? "",
+  );
 
   return (
-    <div className="mb-5 flex items-center gap-4">
-      <div className="relative">
-        <SimpleInput
-          name="location"
-          value={location ?? ""}
-          placeholder="Enter location"
-          variant="rounded"
-          styles={"bg-[#EAF7FD] text-[#212529] h-9 text-sm"}
-          onChange={(e) => {
-            handleSearch(e.target.value);
-            setLocation(e.target.value);
+    <div className="mb-5 grid grid-cols-4 gap-4 xl:grid-cols-4">
+      <div className="col-span-3 sm:col-span-2 xl:col-span-1">
+        <CitiesAutocomplete
+          locationsList={locationsList}
+          isSmallSize={true}
+          variant="blue"
+          className={`w-full`}
+          inputValue={location}
+          value={selectedLocation}
+          setValue={setLocation}
+          onChange={(event, newValue) => {
+            if (!newValue) searchParams.delete("category");
+            updateSearchParams(["match"], [newValue?.match ?? ""]);
+            updateSearchParams(["category"], [""]);
           }}
         />
-        <button
-          className="absolute right-4 top-[5px] text-[#B4CAE4]"
-          onClick={() => {
-            setLocation("");
-            params.delete("Match");
-            router.replace(`/listings?${params.toString()}`);
-          }}
-        >
-          ×
-        </button>
       </div>
-      <div className="relative w-[200px]">
+      <div className="col-span-1 sm:hidden">
+        <GridMapToggle
+          isMapMode={isMapMode}
+          setIsMapMode={setIsMapMode}
+          updateSearchParams={updateSearchParams}
+        />
+      </div>
+      <div className="col-span-2 sm:col-span-2 xl:col-span-1">
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateRangePicker
-            slots={{ field: SingleInputDateRangeField }}
+            slots={{
+              field: SingleInputDateRangeField,
+              day: StyledDatePicker,
+            }}
+            sx={{ width: "100%" }}
             name="allowedRange"
             value={dates}
             format="MMM DD"
+            minDate={dayjs()}
             className="rounded-full border border-[#EAEAEF]"
-            onChange={(newValue) => setDates(newValue as [Dayjs, Dayjs])}
+            onAccept={(newValue) =>
+              updateSearchParams(["fromDate", "toDate"], newValue)
+            }
             slotProps={{
               textField: {
                 variant: "standard",
                 color: "primary",
+                onMouseEnter: () => setShowClearButton(true),
+                onMouseLeave: () => setShowClearButton(false),
+                inputProps: {
+                  placeholder: "Check-in / Check-out",
+                },
                 InputProps: {
                   sx: {
                     fontSize: "14px",
                     fontWeight: 400,
-                    width: "200px",
+                    width: "100%",
                     display: "flex",
-                    pl: "15px",
+                    p: "15px 10px 15px",
                     backgroundColor: "#EAF7FD",
                     height: "36px",
                     borderRadius: "300px",
                     cursor: "pointer",
                   },
                   endAdornment: (
-                    <IconGenerator
-                      src="/down-arrow-light.svg"
-                      alt="Down arrow"
-                      width="16px"
-                      className="mr-2"
-                    />
+                    <>
+                      {showClearButton && (
+                        <InputAdornment position="end">
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              updateSearchParams(
+                                ["fromDate", "toDate"],
+                                [null, null],
+                              )
+                            }
+                          >
+                            <ClearIcon
+                              sx={{
+                                width: "20px",
+                                mr: "2px",
+                                color: "black",
+                              }}
+                            />
+                          </IconButton>
+                        </InputAdornment>
+                      )}
+                      <IconGenerator
+                        src="/down-arrow-light.svg"
+                        alt="Down arrow"
+                        width="18px"
+                        className="w-[20px]"
+                      />
+                    </>
                   ),
                 },
               },
@@ -141,12 +167,32 @@ export default function Filters() {
           />
         </LocalizationProvider>
       </div>
-      <div>
+      <div className="col-span-1 sm:col-span-2 xl:col-span-1">
         <SimpleSelectInput
-          value={numberOfGuests ?? "1"}
-          onChange={(e: SelectChangeEvent<string>) =>
-            setNumberOfGuests(e.target.value)
+          value={
+            searchParamsValues.numberOfGuests !== ""
+              ? searchParamsValues.numberOfGuests
+              : "1"
           }
+          onChange={(e: SelectChangeEvent<string>) =>
+            updateSearchParams(["numberOfGuests"], [e.target.value])
+          }
+          listOptions={guests}
+        />
+      </div>
+      <div className="col-span-1 sm:col-span-2 xl:col-span-1">
+        <CategoriesAutocomplete
+          categories={categories}
+          isSmallSize={true}
+          iconUrl={selectedCategory?.iconUrl ?? "/pool.svg"}
+          variant="blue"
+          inputValue={category}
+          value={selectedCategory}
+          setValue={setCategory}
+          onChange={(event, newValue) => {
+            if (!newValue) searchParams.delete("category");
+            updateSearchParams(["category"], [newValue?.name ?? ""]);
+          }}
         />
       </div>
     </div>

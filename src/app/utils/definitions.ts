@@ -10,4 +10,5 @@ export class FetchError extends Error {
 
 export interface ErrorInterface {
   error: string;
+  message: string;
 }

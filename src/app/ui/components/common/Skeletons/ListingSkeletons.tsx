@@ -11,24 +11,27 @@ export function BreadcrumbSkeleton() {
 
 export function GallerySkeleton() {
   return (
-    <div className="flex grid h-[470px] w-full animate-pulse grid-cols-4 grid-rows-2 gap-5">
-      {Array.from({ length: 5 }, (_, i) => i + 1).map((index) => {
-        return (
-          <div
-            key={index}
-            className={`${index === 1 ? "col-span-2 row-span-2" : "col-span-1 row-span-1"} h-full w-full rounded-[8px]  bg-gray-100`}
-          >
-            <div className="max-h-[500px] w-[640px]" />
-          </div>
-        );
-      })}
-    </div>
+    <>
+      <div className="hidden h-[470px] w-full animate-pulse grid-cols-4 grid-rows-2 gap-5 md:flex md:grid">
+        {Array.from({ length: 5 }, (_, i) => i + 1).map((index) => {
+          return (
+            <div
+              key={index}
+              className={`${index === 1 ? "col-span-2 row-span-2" : "col-span-1 row-span-1"} h-full w-full rounded-[8px]  bg-gray-100`}
+            >
+              <div className="max-h-[500px] w-[640px]" />
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex h-[300px] w-full bg-gray-100 md:hidden" />
+    </>
   );
 }
 
 export function OverviewSkeleton() {
   return (
-    <div className="w-[800px]">
+    <div className="max-w-[800px]">
       <h1 className="text-2xl font-bold">Overview</h1>
       <div className="w-full animate-pulse">
         <div className="mt-4 h-[144px] bg-gray-100"></div>
@@ -54,12 +57,14 @@ export function OverviewSkeleton() {
 
 export function BookItNowSkeleton() {
   return (
-    <div className="flex w-full max-w-[420px] shrink-0 flex-col">
+    <div className="flex w-full flex-col">
       <h1 className="mb-4 text-2xl font-bold">Book it now</h1>
-      <div className="flex animate-pulse flex-col gap-6 rounded-[11px] border border-[#EAEAEF] px-6 py-5">
+      <div
+        className={`flex flex-col gap-6 rounded-[11px] border border-[#EAEAEF] px-6 py-5`}
+      >
         <div className="flex justify-between">
-          <h6>Choose your preferred day</h6>
-          <h6 className="font-medium text-primary">View calendar</h6>
+          <h2>Choose your preferred day</h2>
+          <h3 className="font-medium text-primary">View calendar</h3>
         </div>
         <div className="flex-col rounded-[11px] border border-[#EAEAEF]">
           <div
@@ -72,7 +77,27 @@ export function BookItNowSkeleton() {
         <div className="border-primary-gray-200 rounded-full border bg-gray-100 py-6 font-bold text-primary" />
         <hr />
         <div className="border-primary-gray-200 rounded-full border bg-gray-100 py-6 font-bold text-primary" />
-        <div className="h-[264px] w-full rounded-md bg-gray-100"></div>
+      </div>
+    </div>
+  );
+}
+
+export function PricingDetailsCardSkeleton() {
+  return (
+    <div className="flex w-full max-w-[420px] shrink-0 flex-col">
+      <h1 className="mb-4 text-2xl font-bold">Book it now</h1>
+      <div className="flex w-[420px] animate-pulse flex-col gap-6 rounded-[11px] border border-[#EAEAEF] px-6 py-5">
+        <div className="flex-col rounded-[11px] border border-[#EAEAEF]">
+          <div
+            className="relative px-6 py-5"
+            style={{ borderBottom: "1px solid #EAEAEF" }}
+          >
+            <div className="h-[180px] w-full bg-gray-100" />
+          </div>
+        </div>
+        <div className="border-primary-gray-200 rounded-full border bg-gray-100 py-6 font-bold text-primary" />
+        <hr />
+        <div className="border-primary-gray-200 rounded-full border bg-gray-100 py-6 font-bold text-primary" />
       </div>
     </div>
   );

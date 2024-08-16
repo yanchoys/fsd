@@ -7,6 +7,7 @@ import { Input as BaseInput } from "@mui/base/Input";
 import { styled } from "@mui/material/styles";
 import { resendOtp, verifyAccount } from "~/app/(authentication)/actions";
 import { ActionButton } from "./common";
+import { resetPassOTP } from "~/app/(authentication)/actions";
 
 function OTP({
   length,
@@ -182,9 +183,10 @@ function OTP({
   );
 }
 
-export default function OTPForm() {
+export default function OTPForm({ type }: { type: "verify" | "reset" }) {
   const [otp, setOtp] = useState("");
-  const [errorOtp, dispatchOTP] = useFormState(verifyAccount, undefined);
+  const verifyType = type === "verify" ? verifyAccount : resetPassOTP;
+  const [errorOtp, dispatchOTP] = useFormState(verifyType, undefined);
   const [resendError, dispatchResendOTP] = useFormState(resendOtp, undefined);
   const [canResendOTP, setCanResendOTP] = useState(true);
 
@@ -203,10 +205,8 @@ export default function OTPForm() {
   return (
     <form
       action={() => {
-        dispatchOTP(otp);
-        if (!errorOtp) {
-          localStorage.removeItem("regEmail");
-        }
+        dispatchOTP({ code: otp, email: userEmail });
+        localStorage?.setItem("otpCode", otp);
       }}
       className="flex flex-col gap-12"
     >

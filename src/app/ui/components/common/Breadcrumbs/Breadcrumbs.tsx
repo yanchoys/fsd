@@ -24,7 +24,7 @@ export default function Breadcrumbs({
           <li
             key={breadcrumb.href}
             aria-current={breadcrumb.active}
-            className={breadcrumb.active ? "text-gray-900" : "text-gray-500"}
+            className={`flex items-center ${breadcrumb.active ? "text-gray-900" : "text-gray-500"}`}
           >
             <button
               onClick={() =>

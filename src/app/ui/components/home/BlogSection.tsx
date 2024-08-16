@@ -1,7 +1,11 @@
+import Link from "next/link";
 import { MainCard } from "../common";
+import { getBlogs } from "~/app/(application)/actions";
+import dayjs from "dayjs";
 
-//TODO:make blogSection dynamic
-export function BlogSection() {
+export async function BlogSection() {
+  const blogs = (await getBlogs())!;
+
   return (
     <section className="flex w-full flex-col">
       <div className="flex flex-col items-center">
@@ -12,20 +16,35 @@ export function BlogSection() {
           Latest blog from us
         </h1>
       </div>
-      <div className="grid grid-cols-3 gap-5 pb-12 pt-10 desktop:grid-cols-4">
-        {Array.from({ length: 4 }, (_, i) => i + 1).map((card) => {
-          return (
-            <MainCard
-              id="static-id"
-              source={""}
-              imageUrl="/blog_photo.jpeg"
-              name="How to get more bookings with Coolvacay in 2024"
-              subtitle="August 1, 2024  •  2 min read "
-              key={card}
-              isBlogCard
-            />
-          );
-        })}
+      <div className="no-scrollbar flex items-center gap-5 overflow-auto pb-10 sm:flex-row sm:flex-wrap sm:justify-between">
+        {blogs.length > 0 ? (
+          blogs.slice(0, 4).map((blog) => {
+            return (
+              <Link
+                href={`/blog/${blog.id}`}
+                key={blog.id}
+                className="h-[340px]"
+              >
+                <MainCard
+                  imageUrl={
+                    blog.thumbnailImageUrl.length > 0
+                      ? blog.thumbnailImageUrl
+                      : "/blog_photo.jpeg"
+                  }
+                  name={
+                    blog.title ??
+                    "How to get more bookings with Coolvacay in 2024"
+                  }
+                  subtitle={`${dayjs(blog.createdOn).format("MMMM D, YYYY")}  •  ${blog.readTime} read `}
+                  key={blog.id}
+                  isBlogCard
+                />
+              </Link>
+            );
+          })
+        ) : (
+          <p>No blogs available at the moment</p>
+        )}
       </div>
     </section>
   );

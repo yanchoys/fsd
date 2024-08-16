@@ -1,6 +1,6 @@
 import React from "react";
 
-function CustomChip({ label, width }: { label: string; width: number }) {
+export function CustomChip({ label, width }: { label: string; width: number }) {
   return (
     <div
       style={{ width: width }}
@@ -10,5 +10,3 @@ function CustomChip({ label, width }: { label: string; width: number }) {
     </div>
   );
 }
-
-export default CustomChip;

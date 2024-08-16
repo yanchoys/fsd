@@ -1,77 +1,59 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import type { EmblaOptionsType } from "embla-carousel";
-import { useSearchParams, usePathname, useRouter } from "next/navigation";
-import { Dialog, DialogContent } from "@mui/material";
+import { Dialog, DialogContent, Divider } from "@mui/material";
+import { useAppSearchParams } from "~/context/SearchParamsContext";
 
-import type { ListingData } from "~/app/(application)/definitions";
+import type { IListingData } from "~/app/(application)/definitions";
 import EmblaCarousel from "../../listing/Carousel/EmblaCarousel";
 import CloseIcon from "@mui/icons-material/Close";
 import "../../listing/Carousel/embla.css";
+import { useMediaQuery } from "@mui/material";
 
 export default function FullScreenDialog({
   listing,
   isModalOpen,
   setIsModalOpen,
-  handleClick,
 }: {
   isModalOpen: boolean;
   setIsModalOpen: Dispatch<SetStateAction<boolean>>;
-  listing: ListingData;
-  handleClick: (url?: number | string) => void;
+  listing: IListingData;
 }) {
-  const searchParams = useSearchParams();
-  const params = useMemo(() => {
-    return new URLSearchParams(searchParams);
-  }, [searchParams]);
+  const fullScreenModal = useMediaQuery("(max-width:640px)");
 
-  const router = useRouter();
-  const pathname = usePathname();
-  const OPTIONS: EmblaOptionsType = {};
-  const SLIDES = Array.from(Array(listing.images).keys());
+  const { updateSearchParams, searchParams } = useAppSearchParams();
 
   //TODO: replace params with Link, check Link options
   useEffect(() => {
-    setIsModalOpen(params?.get("query")?.includes("photoGallery") ?? false);
-  }, [params, setIsModalOpen]);
+    setIsModalOpen(
+      searchParams?.get("modal")?.includes("photoGallery") ?? false,
+    );
+  }, [searchParams, setIsModalOpen]);
 
   const handleClose = () => {
     setIsModalOpen(false);
-    params.delete("query");
-    router.replace(`${pathname}?${params.toString()}`);
+    updateSearchParams(["modal"], [""]);
   };
 
   return (
-    <>
-      <Dialog
-        fullWidth={true}
-        maxWidth="xl"
-        open={isModalOpen}
-        onClose={handleClose}
-        PaperProps={{
-          style: {
-            height: "100vh",
-          },
-        }}
-      >
-        <div className="flex justify-between p-6">
-          <h1 className="text-2xl font-medium	">{listing.name}</h1>
-          <button onClick={handleClose} className="hover:text-primary">
-            <CloseIcon fontSize="large" />
-          </button>
-        </div>
-        <DialogContent className="align-center flex justify-center pt-0">
-          <EmblaCarousel
-            slides={SLIDES}
-            handleClick={handleClick}
-            options={OPTIONS}
-            images={listing.images}
-            slideNr={Number.parseInt(params.get("query")?.at(-1) ?? "0")}
-          />
-        </DialogContent>
-      </Dialog>
-    </>
+    <Dialog
+      maxWidth="lg"
+      fullScreen={fullScreenModal}
+      open={isModalOpen}
+      onClose={handleClose}
+      className="sm:h-screen"
+    >
+      <div className="flex justify-between p-4 sm:p-6">
+        <h1 className="text-lg font-medium sm:text-2xl	">{listing.name}</h1>
+        <button onClick={handleClose} className="hover:text-primary">
+          <CloseIcon className="text-[14px] sm:text-[25px]" />
+        </button>
+      </div>
+      <Divider className="text-[#EAEAEF]" />
+      <DialogContent className="px-0 md:mx-6 md:pb-6 md:pt-2">
+        <EmblaCarousel data={listing.images} type="image" />
+      </DialogContent>
+    </Dialog>
   );
 }

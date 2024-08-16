@@ -3,73 +3,80 @@
 import { LocalizationProvider } from "@mui/x-date-pickers-pro";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { IconGenerator } from "../IconGenerator";
 import type { DateRangeType } from "../../home/SearchCard";
 import type { Dayjs } from "dayjs";
+import StyledDatePicker from "./StyledDatePicker";
+import type { IPropertyAvailability } from "~/app/(application)/definitions";
+import { useMediaQuery } from "@mui/material";
 
 const RangeDatePicker = ({
   size,
   dates,
   setDates,
+  availableDates,
 }: {
-  size: "small" | "big";
+  size: "small" | "medium" | "big";
   dates: DateRangeType;
-  setDates: React.Dispatch<React.SetStateAction<DateRangeType>>;
+  setDates:
+    | React.Dispatch<React.SetStateAction<DateRangeType>>
+    | ((values: DateRangeType) => void);
+  availableDates?: IPropertyAvailability;
 }) => {
   const bigFont = size === "big";
+  const mediumFont = size === "medium";
+
+  const matches = useMediaQuery("@media (pointer: fine)");
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <DemoContainer
+      <DateRangePicker
         sx={{
+          height: "100%",
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
-          height: "100%",
+          position: "relative",
         }}
-        components={["DateRangePicker"]}
-      >
-        <DateRangePicker
-          sx={{
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-          }}
-          slotProps={{
-            fieldSeparator: {
-              sx: {
-                backgroundColor: "#EAEAEF",
-                color: "transparent",
-                width: "1px",
-                height: "62px",
-                position: "absolute",
-                left: bigFont ? "190px" : "175px",
-                top: bigFont ? "20px" : "12px",
-              },
+        slots={{ day: StyledDatePicker }}
+        format="MMM DD, YYYY"
+        slotProps={{
+          fieldSeparator: {
+            sx: { color: "transparent" },
+            className: `${bigFont || mediumFont ? "sm:h-16 h-14" : "h-11"} w-[1px] absolute bg-primary-grey100 inset-x-2/4`,
+          },
+          day: {
+            // @ts-expect-error MUI doesnt recognize forwardProp
+            availableDates: availableDates,
+          },
+          textField: {
+            variant: "standard",
+            InputLabelProps: {
+              className: `${bigFont ? "sm:text-2xl text-xl sm:-top-3 -top-2" : mediumFont ? "text-xl -top-2" : "text-base -top-1"} font-medium absolute`,
             },
-            textField: {
-              variant: "standard",
-              InputLabelProps: {
-                className: `${bigFont ? "text-2xl -top-3" : "text-xl -top-2"} font-medium absolute`,
-              },
-              InputProps: {
-                sx: { fontSize: bigFont ? "20px" : "16px", fontWeight: 500 },
-                startAdornment: (
-                  <IconGenerator
-                    alt="Calendar icon"
-                    src={`/calendar_icon.svg`}
-                    width={bigFont ? "32px" : "21px"}
-                    className={bigFont ? "mr-3" : "mr-2"}
-                  />
-                ),
-              },
+            InputProps: {
+              className: `${bigFont ? "sm:text-xl sm:font-medium" : mediumFont ? "text-base" : "text-xs "} ${matches ? "font-medium" : ""}`,
+              startAdornment: matches ? (
+                <IconGenerator
+                  alt="Calendar icon"
+                  src={`/calendar_icon.svg`}
+                  className={
+                    bigFont
+                      ? "mr-3 w-4 sm:w-8"
+                      : mediumFont
+                        ? "mr-2 w-5"
+                        : "mr-2 w-4"
+                  }
+                />
+              ) : null,
             },
-          }}
-          value={dates}
-          onChange={(newValue) => setDates(newValue as [Dayjs, Dayjs])}
-          localeText={{ start: "Check-in", end: "Check-out" }}
-        />
-      </DemoContainer>
+          },
+        }}
+        value={dates}
+        onAccept={(newValue) => {
+          setDates(newValue as [Dayjs, Dayjs]);
+        }}
+        localeText={{ start: "Check-in", end: "Check-out" }}
+      />
     </LocalizationProvider>
   );
 };

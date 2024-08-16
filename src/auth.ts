@@ -7,11 +7,16 @@ import { postFetch } from "./app/utils/api-helpers";
 import type { User, NextAuthConfig, Session } from "next-auth";
 import type { Provider } from "next-auth/providers";
 import type { JWT } from "next-auth/jwt";
-import type { UserData } from "./app/(application)/definitions";
-import { authenticateGO } from "./app/(authentication)/actions";
+import type { TUserData } from "./app/(application)/definitions";
+import { authenticateFB, authenticateGO } from "./app/(authentication)/actions";
+import { redirect } from "next/navigation";
 
 type CustomUser =
-  | (User & Pick<UserData["profile"], "phone" | "dateOfBirth" | "lastName">)
+  | (User &
+      Pick<
+        TUserData["profile"],
+        "phone" | "dateOfBirth" | "lastName" | "nationality"
+      >)
   | null;
 
 declare module "next-auth" {
@@ -21,10 +26,15 @@ declare module "next-auth" {
   interface User {
     id?: string;
     name?: string | null;
-    lastName?: string | null;
-    phone?: string;
+    image?: string | null;
     email?: string | null;
-    dateOfBirth?: string;
+    lastName: string | null;
+    phone: string;
+    dateOfBirth: string;
+    nationality: string;
+    accessToken: string;
+    signedInWith: string;
+    profilePicture: string | null;
   }
 }
 
@@ -33,13 +43,17 @@ declare module "next-auth/jwt" {
     id: string;
     lastName: string;
     phone: string;
+    profilePicture: string;
     dateOfBirth: string;
+    nationality: string;
+    accessToken: string;
+    signedInWith: string;
   }
 }
 
 async function getUserFromDb(email: string, password: string) {
   try {
-    const userData = await postFetch<UserData | Error>("/Auth/access-token", {
+    const userData = await postFetch<TUserData | Error>("/Auth/access-token", {
       email,
       password,
     });
@@ -67,15 +81,20 @@ const providers: Provider[] = [
 
       if (parsedCredentials.success) {
         const { email, password } = parsedCredentials.data;
-        const user = (await getUserFromDb(email, password)) as UserData;
+        const user = (await getUserFromDb(email, password)) as TUserData;
         if (user?.accessToken) {
           return {
+            accessToken: user.accessToken,
+            signedInWith: user.signedInWith,
             id: user.profile.id.toString(),
             name: user.profile.firstName,
             lastName: user.profile.lastName,
             phone: user.profile.phone,
             email: user.profile.email,
+            image: user.profile.image,
             dateOfBirth: user.profile.dateOfBirth,
+            nationality: user.profile.nationality,
+            profilePicture: user.profile.profilePicture,
           };
         } else {
           return null;
@@ -102,11 +121,54 @@ const authOptions: NextAuthConfig = {
   providers,
   pages: {
     signIn: "/signin",
+    error: "/access-denied",
   },
   callbacks: {
-    async signIn({ account }) {
+    async authorized({ auth, request: { nextUrl } }) {
+      const isLoggedIn = !!auth?.user;
+      const isOnProfile = nextUrl.pathname.startsWith("/profile");
+      if (isOnProfile) {
+        if (isLoggedIn) return true;
+        return false;
+      } else if (isLoggedIn) {
+        return Response.redirect(new URL("/", nextUrl));
+      }
+      return true;
+    },
+    async signIn({ user, account }) {
       if (account?.provider === "google") {
-        await authenticateGO(account.id_token, account.access_token);
+        const googleUser = await authenticateGO(
+          account.id_token,
+          account.access_token,
+        );
+        if (typeof googleUser !== "string") {
+          const userData = googleUser!;
+          user.id = userData.profile.id.toString();
+          user.lastName = userData.profile.lastName;
+          user.phone = userData.profile.phone;
+          user.dateOfBirth = userData.profile.dateOfBirth;
+          user.nationality = userData.profile.nationality;
+          user.accessToken = userData.accessToken;
+          user.profilePicture = userData.profile.profilePicture;
+          user.signedInWith = userData.signedInWith;
+        } else {
+          redirect("/signin");
+        }
+      } else if (account?.provider === "facebook") {
+        const facebookUser = await authenticateFB(account.access_token);
+        if (typeof facebookUser !== "string") {
+          const userData = facebookUser!;
+          user.id = userData.profile.id.toString();
+          user.lastName = userData.profile.lastName;
+          user.phone = userData.profile.phone;
+          user.dateOfBirth = userData.profile.dateOfBirth;
+          user.nationality = userData.profile.nationality;
+          user.accessToken = userData.accessToken;
+          user.profilePicture = userData.profile.profilePicture;
+          user.signedInWith = userData.signedInWith;
+        } else {
+          redirect("/signin");
+        }
       }
       return true;
     },
@@ -117,6 +179,10 @@ const authOptions: NextAuthConfig = {
         session.user.lastName = token.lastName;
         session.user.phone = token.phone;
         session.user.dateOfBirth = token.dateOfBirth;
+        session.user.nationality = token.nationality;
+        session.user.accessToken = token.accessToken;
+        session.user.signedInWith = token.signedInWith;
+        session.user.profilePicture = token.profilePicture;
       }
       return session;
     },
@@ -126,6 +192,9 @@ const authOptions: NextAuthConfig = {
         token.lastName = user.lastName!;
         token.phone = user.phone!;
         token.dateOfBirth = user.dateOfBirth!;
+        token.accessToken = user.accessToken!;
+        token.signedInWith = user.signedInWith!;
+        token.profilePicture = user.profilePicture!;
       }
       return token;
     },

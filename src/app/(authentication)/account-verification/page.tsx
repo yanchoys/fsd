@@ -23,7 +23,7 @@ export default function AccountCreationCode() {
           </p>
         </div>
         <div className="flex flex-col">
-          <OTPForm />
+          <OTPForm type="verify" />
         </div>
       </div>
     </div>

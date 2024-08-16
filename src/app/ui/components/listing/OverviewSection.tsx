@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import type { ListingData } from "~/app/(application)/definitions";
-import { IconGenerator, MapContainer } from "../common";
+import type { IListingData } from "~/app/(application)/definitions";
+import { IconGenerator } from "../common";
 
-export default function Overview({ listing }: { listing: ListingData }) {
+export default function Overview({ listing }: { listing: IListingData }) {
   const [readMore, setReadMore] = useState(false);
+  const [viewMore, setViewMore] = useState(false);
+
   return (
     <div className="max-w-[800px]">
       <h1 className="text-2xl font-bold">Overview</h1>
       <article
-        className={`${readMore ? "line-clamp-none" : "line-clamp-6 "} pt-4 text-justify `}
+        className={`${readMore ? "line-clamp-none" : "line-clamp-6 "} whitespace-pre-line pt-4 text-justify	`}
       >
         {listing.description}
       </article>
@@ -20,29 +22,29 @@ export default function Overview({ listing }: { listing: ListingData }) {
       >
         {readMore ? "Read less" : "Read more"}
       </button>
-      <div className="grid grid-cols-3 py-10">
-        {listing.amenities.map((amenitie, index) => {
+      <article className="grid grid-cols-2 pt-10 lg:grid-cols-3">
+        {listing.amenities.map((amenity, index) => {
           return (
-            <div key={index} className="flex items-center gap-2">
-              <IconGenerator
-                key={index}
-                src="/home-icon.svg"
-                width="20px"
-                alt="home icon"
-              />
-              <h6 className="font-medium">{amenitie}</h6>
-            </div>
+            (!viewMore ? index < 9 : index >= 0) && (
+              <div key={index} className="flex items-center gap-2">
+                <IconGenerator
+                  key={index}
+                  src="/home-icon.svg"
+                  width="20px"
+                  alt="home icon"
+                />
+                <h1 className="text-sm font-medium">{amenity}</h1>
+              </div>
+            )
           );
         })}
-      </div>
-      <div className="max-h-60 w-full">
-        <MapContainer listings={[{ ...listing }]} singleListing />
-      </div>
-      <div className="py-6">
-        <h1 className="text-sm text-[#676D73]">
-          Listed by <span className="text-sm text-black">{listing.source}</span>
-        </h1>
-      </div>
+      </article>
+      <button
+        onClick={() => setViewMore(!viewMore)}
+        className="mb-10 mt-1 flex select-none text-sm font-bold text-primary transition-all hover:text-sky-700"
+      >
+        {viewMore ? "View less" : "View more"}
+      </button>
     </div>
   );
 }

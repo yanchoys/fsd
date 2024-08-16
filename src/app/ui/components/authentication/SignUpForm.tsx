@@ -103,6 +103,7 @@ export default function SignUpForm() {
         <FormikTextField
           placeholder="Password"
           name="password"
+          type="password"
           error={formik.touched.password && Boolean(formik.errors.password)}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
@@ -116,6 +117,7 @@ export default function SignUpForm() {
           name="areConditionsAccepted"
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
+          noreferrerLink
           checked={formik.values.areConditionsAccepted}
           label="I agree to the Terms & Privacy"
           helperText="You have to agree to the Terms & Privacy before continuing"

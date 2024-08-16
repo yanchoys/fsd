@@ -1,56 +1,99 @@
 "use client";
 
-import { Select, MenuItem } from "@mui/material";
+import { Select } from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material";
+import { IconGenerator } from "../IconGenerator";
+import React from "react";
 
-const guests = Array.from({ length: 8 }, (v, i) => i + 1).map((item) =>
-  item.toString(),
-);
-
-export default function SimpleSelectInput({
-  value,
-  onChange,
-}: {
-  value: string;
+interface SimpleSelectInputProps {
+  value?: string;
   onChange: (event: SelectChangeEvent<string>, child: React.ReactNode) => void;
-}) {
+  listOptions: React.ReactNode | JSX.Element[];
+  size?: "small" | "medium";
+  error?: boolean;
+  onBlur?: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+  name?: string;
+  placeholder?: string;
+  disabled?: boolean;
+  variant?: "rounded" | "rectangle";
+}
+
+const SimpleSelectInput: React.FC<SimpleSelectInputProps> = ({
+  name,
+  value,
+  listOptions,
+  size = "small",
+  onBlur,
+  onChange,
+  error,
+  placeholder,
+  disabled,
+  variant = "rounded",
+}) => {
+  const isSmallSize = size === "small";
+  const isRoundedVariant = variant === "rounded";
+
+  const selectStyles = {
+    padding: "0px !important",
+    fontSize: isSmallSize ? "14px" : "16px",
+    backgroundColor: isSmallSize ? "#EAF7FD" : "#fff",
+    fontWeight: 400,
+    height: isSmallSize ? "36px" : !isRoundedVariant ? "39px" : "58px",
+    borderRadius: isRoundedVariant ? "300px" : "8px",
+    "& .MuiInputBase-input": {
+      "&:focus": {
+        borderRadius: isRoundedVariant ? "300px" : "8px",
+        borderColor: "#29ABE2",
+        padding: isSmallSize
+          ? "9px 14px"
+          : isRoundedVariant
+            ? "18px 14px"
+            : "9px 14px",
+        boxShadow: "0 0 0 0.1rem #29ABE2",
+      },
+    },
+    "& .Mui-disabled": {
+      padding: isSmallSize
+        ? "9px 14px"
+        : isRoundedVariant
+          ? "18px 14px"
+          : "9px 14px",
+      backgroundColor: "#E7E7E7",
+      borderRadius: "6px",
+      WebkitTextFillColor: "#676D73",
+    },
+  };
+
   return (
-    <div className="relative w-[200px] rounded-[300px] border border-[#EAEAEF]">
+    <div
+      className={`relative ${isSmallSize ? "max-w-[220px]" : "w-full"} ${isRoundedVariant ? "rounded-[300px]" : "rounded-lg"} border border-[#EAEAEF]`}
+    >
       <Select
         fullWidth
         value={value}
+        name={name}
+        placeholder={placeholder}
+        onBlur={onBlur}
+        error={error}
+        disabled={disabled}
+        label="Nationality"
         onChange={onChange}
-        sx={{
-          padding: "0px !important",
-          fontSize: "14px",
-          backgroundColor: "#EAF7FD",
-          fontWeight: 400,
-          height: "36px",
-          borderRadius: "300px",
-          "& .MuiSvgIcon-root": {
-            position: "absolute",
-            display: "none",
-            top: 6,
-          },
-          "& .MuiInputBase-input": {
-            "&:focus": {
-              borderRadius: 300,
-              borderColor: "#29ABE2",
-              padding: "8px 14px",
-              boxShadow: "0 0 0 0.1rem #29ABE2",
-            },
-          },
-        }}
-        labelId="customized-select-label"
-        id="customized-select"
-        defaultValue={guests[0]}
+        IconComponent={() => (
+          <IconGenerator
+            alt="avatar icon"
+            src={`/down-arrow.svg`}
+            width={isSmallSize ? "18px" : "22px"}
+            className={`pointer-events-none absolute ${isSmallSize ? "right-2 top-[11px]" : isRoundedVariant ? "right-4 top-[18px]" : "right-3 top-[10px]"}`}
+          />
+        )}
+        sx={selectStyles}
+        labelId={`${name}-select-label`}
+        id={`${name}-select`}
       >
-        {guests.map((guest) => (
-          <MenuItem key={guest} value={guest} dense>
-            {`${guest} ${guest === "1" ? "guest" : "guests"}`}
-          </MenuItem>
-        ))}
+        {listOptions}
       </Select>
     </div>
   );
-}
+};
+
+export default SimpleSelectInput;

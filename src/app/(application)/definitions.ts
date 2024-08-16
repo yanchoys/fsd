@@ -1,4 +1,4 @@
-export interface ListingData {
+export interface IListingData {
   id: string;
   source: string;
   name: string;
@@ -11,7 +11,7 @@ export interface ListingData {
   bathrooms: number;
   bedrooms: number;
   propertyType?: string;
-  startRating: number | null;
+  starRating: number | null;
   squareFeets?: number | undefined;
   price: number;
   imageUrl: string;
@@ -23,22 +23,40 @@ export interface ListingData {
   }[];
   amenities: string[];
   numberOfGuests: number;
+  cancellationPolicy: string;
+  houseRules: string;
+}
+
+export interface IAllListings {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+  items: IListingData[];
 }
 
 export type ListingCardProps = Pick<
-  ListingData,
+  IListingData,
   "name" | "imageUrl" | "price" | "id" | "source"
-> & { subtitle: string };
+> & {
+  subtitle: string;
+  starRating?: number | null;
+  closeDates?: {
+    startDate: string;
+    endDate: string;
+    nrOfNights: number;
+  }[];
+};
 
-export type MainCardProps = Pick<
-  ListingData,
-  "name" | "imageUrl" | "propertyType" | "squareFeets" | "id" | "source"
+export type TMainCardProps = Pick<
+  IListingData,
+  "name" | "imageUrl" | "propertyType" | "squareFeets"
 > & { isBlogCard?: boolean; subtitle: string };
 
-export type SimilarCardProps = MainCardProps &
-  Pick<ListingData, "bedrooms" | "bathrooms" | "numberOfGuests" | "price">;
+export type TSimilarCardProps = TMainCardProps &
+  Pick<IListingData, "bedrooms" | "bathrooms" | "numberOfGuests" | "price">;
 
-export interface PopularCategoriesData {
+export interface IPopularCategoriesData {
   id: number;
   name: string;
   iconName: string;
@@ -48,22 +66,175 @@ export interface PopularCategoriesData {
   page: string;
 }
 
-export type MapboxMarkerData = Pick<
-  ListingData,
-  "id" | "name" | "city" | "state" | "price" | "latitude" | "longitude"
+export type TMapboxMarkerData = Pick<
+  IListingData,
+  | "id"
+  | "name"
+  | "city"
+  | "state"
+  | "price"
+  | "latitude"
+  | "longitude"
+  | "source"
 >;
 
-export type UserData = {
+export type TUserData = {
   accessToken: string;
   accessTokenExpiresAt: string;
+  signedInWith: string;
   profile: {
     id: number | string;
     firstName: string;
     lastName: string;
     email: string;
     phone: string;
+    image: string;
     nationality: string;
     dateOfBirth: string;
+    creationDate: string;
     gender: string;
+    profilePicture: string;
   };
 };
+export interface IParams {
+  source?: string;
+  id?: string;
+}
+
+export interface IInquireArgs {
+  name?: string;
+  message?: string;
+  phone?: string;
+  email?: string;
+  propertySource?: string;
+  propertyId?: string;
+}
+
+export interface IProfileDetails {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  nationality?: string;
+  dateOfBirth?: string;
+  gender?: string;
+}
+
+export interface IBookingPaymentArgs {
+  userId?: number;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  address1?: string;
+  address2?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  country?: string;
+  listingId?: string;
+  source?: string;
+  fromDate?: string;
+  toDate?: string;
+  adults?: number;
+  children?: number;
+  infants?: number;
+  pets?: number;
+  cardDetails?: {
+    cardNumber: string;
+    expiryDate: string;
+    cvc: string;
+    cardHolderName: string;
+  };
+}
+
+export interface IPassArgs {
+  userId?: string;
+  oldPassword?: string;
+  newPassword?: string;
+}
+
+export interface IPricingDetailsArgs {
+  source: string;
+  id: string;
+  startDate: string;
+  endDate: string;
+  numberOfGuests: string;
+}
+
+export interface ICountries {
+  id: string;
+  name: string;
+  states:
+    | {
+        id: string;
+        name: string;
+      }[]
+    | [];
+}
+
+export interface ILocationsList {
+  id: number;
+  icon: string;
+  match: string;
+  displayName: string;
+}
+
+export interface IReservationsDetails {
+  id: number;
+  userId: number;
+  listingId: string;
+  email: string;
+  source: string;
+  fromDate: string;
+  toDate: string;
+  adults: number;
+  children: number;
+  infants: number;
+  pets: number;
+  status: number;
+  details: {
+    listingId: string;
+    listingSource: string;
+    listingName: string;
+    listingImage: string;
+    listingType: string;
+    squareFeets: number | null;
+    bedrooms: number;
+    bathrooms: number;
+    pricePerNight: number;
+    fromDate: string;
+    toDate: string;
+    totalPrice: number;
+  };
+}
+
+export interface IBlog {
+  id: string;
+  title: string;
+  description: string;
+  isFeatured: boolean;
+  thumbnailImageUrl: string;
+  readTime: string;
+  createdOn: string;
+  relatedLocation: string;
+}
+
+export interface IPropertyAvailability {
+  from: string;
+  to: string;
+  availabilityArray: {
+    date: string;
+    isAvailable: boolean;
+  }[];
+}
+
+export interface ICloseDatesListings {
+  listingId: string;
+  availableDates: {
+    startDate: string;
+    endDate: string;
+    nrOfNights: number;
+  }[];
+  listing: IListingData;
+}

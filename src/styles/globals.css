@@ -5,7 +5,6 @@
 .mapboxgl-popup-content {
   display: flex;
   width: 270px !important;
-  height: 200px !important;
   justify-content: center;
   flex-direction: column;
   padding: 20px !important;
